@@ -10,7 +10,11 @@ dependencies = [
   "pydantic-settings>=2.10.0",
   "sqlalchemy>=2.0.41",
   "alembic>=1.16.4",
-  "psycopg[binary]>=3.2.9"
+  "psycopg[binary]>=3.2.9",
+  "httpx>=0.28.1",
+  "apscheduler>=3.10.4",
+  "streamlit>=1.44.1",
+  "pandas>=2.2.3"
 ]
 
 [build-system]
