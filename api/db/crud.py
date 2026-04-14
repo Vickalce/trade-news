@@ -12,6 +12,17 @@ def get_recent_events(db: Session, limit: int = 50) -> list[NewsEvent]:
     return list(db.scalars(stmt))
 
 
+def get_recent_unscored_events(db: Session, limit: int = 50) -> list[NewsEvent]:
+    """Get recent events that have not yet been scored by the pipeline."""
+    stmt: Select[tuple[NewsEvent]] = (
+        select(NewsEvent)
+        .where(NewsEvent.has_been_scored == False)
+        .order_by(desc(NewsEvent.event_time_utc))
+        .limit(limit)
+    )
+    return list(db.scalars(stmt))
+
+
 def get_event_by_dedupe_hash(db: Session, dedupe_hash: str) -> NewsEvent | None:
     stmt: Select[tuple[NewsEvent]] = select(NewsEvent).where(NewsEvent.dedupe_hash == dedupe_hash)
     return db.scalar(stmt)
@@ -104,3 +115,9 @@ def get_latest_recommendation_for_symbol(db: Session, symbol: str) -> Recommenda
 def count_alerts_since(db: Session, since_utc: datetime) -> int:
     stmt = select(func.count(AlertLog.id)).where(AlertLog.delivered_at_utc >= since_utc)
     return int(db.scalar(stmt) or 0)
+
+
+def mark_event_as_scored(db: Session, event_id: int) -> None:
+    """Mark an event as having been processed by the pipeline."""
+    event = db.query(NewsEvent).filter(NewsEvent.id == event_id).one()
+    event.has_been_scored = True

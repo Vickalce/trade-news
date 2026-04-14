@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import DateTime, Float, ForeignKey, Index, Integer, String, Text
+from sqlalchemy import DateTime, Float, ForeignKey, Index, Integer, String, Text, Boolean
 from sqlalchemy.orm import Mapped, mapped_column
 
 from api.db.base import Base
@@ -19,6 +19,7 @@ class NewsEvent(Base):
     language: Mapped[str] = mapped_column(String(16), default="en")
     category: Mapped[Optional[str]] = mapped_column(String(64), index=True)
     dedupe_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    has_been_scored: Mapped[bool] = mapped_column(default=False, index=True)
 
 
 class EventEntity(Base):

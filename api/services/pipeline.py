@@ -38,7 +38,7 @@ def run_ingestion_only(db: Session) -> dict[str, int]:
 
 def run_signal_pipeline(db: Session, limit: int = 20) -> list[PipelineResult]:
     results: list[PipelineResult] = []
-    events = crud.get_recent_events(db, limit=limit)
+    events = crud.get_recent_unscored_events(db, limit=limit)
     today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
     channels = [item.strip() for item in settings.alert_channels_csv.split(",") if item.strip()]
     if not channels:
@@ -132,6 +132,9 @@ def run_signal_pipeline(db: Session, limit: int = 20) -> list[PipelineResult]:
                 priority=priority,
             )
         )
+        
+        # Mark event as scored so it won't be re-processed on next run
+        crud.mark_event_as_scored(db, event.id)
 
     db.commit()
     return results
