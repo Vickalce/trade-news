@@ -87,7 +87,10 @@ def run_signal_pipeline(db: Session, limit: int = 20) -> list[PipelineResult]:
         latest_for_symbol = crud.get_latest_recommendation_for_symbol(db, symbol)
         if latest_for_symbol is not None:
             cooldown_cutoff = datetime.now(timezone.utc) - timedelta(minutes=settings.symbol_cooldown_minutes)
-            in_cooldown = latest_for_symbol.created_at_utc >= cooldown_cutoff
+            created_at = latest_for_symbol.created_at_utc
+            if created_at.tzinfo is None:
+                created_at = created_at.replace(tzinfo=timezone.utc)
+            in_cooldown = created_at >= cooldown_cutoff
             conflicting = latest_for_symbol.recommendation != recommendation and recommendation != "hold"
             if in_cooldown and conflicting:
                 recommendation = "hold"
