@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>News to Investment Strategies - Roadmap Presentation</title>
+  <style>
+    :root {
+      --bg1: #0f172a;
+      --bg2: #1e293b;
+      --panel: #ffffff;
+      --ink: #0f172a;
+      --ink-soft: #334155;
+      --accent: #0ea5e9;
+      --accent-2: #22c55e;
+      --warn: #f59e0b;
+      --bad: #ef4444;
+      --muted: #e2e8f0;
+      --shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: #0b1020; 
+      background:
+        radial-gradient(circle at 20% 20%, rgba(14, 165, 233, 0.18), transparent 35%),
+        radial-gradient(circle at 80% 10%, rgba(34, 197, 94, 0.12), transparent 30%),
+        linear-gradient(145deg, var(--bg1), var(--bg2));
+    }
+
+    .deck {
+      height: 100vh;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+    }
+
+    .slide {
+      min-height: 100vh;
+      padding: 48px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      scroll-snap-align: start;
+    }
+
+    .card {
+      width: min(1100px, 96vw);
+      background: var(--panel);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 34px;
+      border: 1px solid #dbeafe;
+    }
+
+    h1, h2, h3 {
+      margin: 0 0 12px;
+      line-height: 1.2;
+      color: var(--ink);
+    }
+
+    h1 { font-size: clamp(28px, 4vw, 48px); }
+    h2 { font-size: clamp(24px, 3.2vw, 38px); }
+    h3 { font-size: clamp(18px, 2.2vw, 24px); }
+
+    p, li {
+      font-size: clamp(16px, 1.65vw, 22px);
+      line-height: 1.5;
+      color: var(--ink-soft);
+    }
+
+    ul, ol { margin: 10px 0 0 24px; }
+
+    .subtitle {
+      font-size: clamp(18px, 2vw, 26px);
+      color: #1d4ed8;
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.3px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      background: #e0f2fe;
+      color: #075985;
+      border: 1px solid #bae6fd;
+    }
+
+    .box {
+      background: #f8fafc;
+      border: 1px solid #dbeafe;
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .kpi {
+      background: #eff6ff;
+      border-left: 6px solid var(--accent);
+      padding: 10px 14px;
+      border-radius: 10px;
+      margin-top: 12px;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .step {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+      font-weight: 700;
+      color: #1e293b;
+      font-size: 14px;
+      min-height: 95px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .timeline {
+      margin-top: 14px;
+      border-left: 4px solid #93c5fd;
+      padding-left: 14px;
+    }
+
+    .time-item {
+      background: #f8fafc;
+      border: 1px solid #dbeafe;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+
+    .green { border-left-color: var(--accent-2); }
+    .amber { border-left-color: var(--warn); }
+    .red { border-left-color: var(--bad); }
+
+    .footer {
+      margin-top: 24px;
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    @media (max-width: 900px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .flow { grid-template-columns: 1fr; }
+      .card { padding: 24px; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .deck { height: auto; overflow: visible; }
+      .slide { min-height: auto; padding: 16px 0; }
+      .card { box-shadow: none; border: 1px solid #cbd5e1; page-break-inside: avoid; }
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .badge-done { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+    .badge-next { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .stat-box {
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+    }
+    .stat-num {
+      font-size: clamp(28px, 3.5vw, 44px);
+      font-weight: 800;
+      color: #166534;
+      display: block;
+    }
+    .stat-label {
+      font-size: 14px;
+      color: #4b5563;
+      margin-top: 4px;
+    }
+    .endpoint {
+      background: #1e293b;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-family: "Cascadia Code", "Consolas", monospace;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+    .ep-method { color: #86efac; font-weight: 700; margin-right: 8px; }
+    .ep-status { float: right; color: #4ade80; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="deck">
+    <section class="slide">
+      <div class="card">
+        <h1>News to Investment Strategies</h1>
+        <p class="subtitle">MVP Delivered — System Live as of April 2026</p>
+        <p>Built on your setup: Schwab/thinkorswim broker integration, Yahoo Finance live quotes, and RSS news ingestion. No enterprise licensing required.</p>
+        <div style="margin-top: 16px;">
+          <span class="pill" style="background:#dcfce7;color:#166534;border-color:#86efac;">&#x2705; All 5 phases shipped</span>
+          <span class="pill" style="background:#dcfce7;color:#166534;border-color:#86efac;">&#x2705; 12 tests passing</span>
+          <span class="pill" style="background:#dcfce7;color:#166534;border-color:#86efac;">&#x2705; Smoke-tested April 14, 2026</span>
+        </div>
+        <div class="kpi green">
+          <strong>Achieved:</strong> headline to clear recommendation in under 60 seconds — validated live on April 14, 2026.
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="card">
+        <h2>What Was Shipped <span class="badge badge-done" style="font-size:15px;vertical-align:middle;margin-left:10px;">&#x2705; Live April 2026</span></h2>
+        <div class="status-grid">
+          <div class="stat-box">
+            <span class="stat-num">5</span>
+            <div class="stat-label">API Endpoints Live</div>
+          </div>
+          <div class="stat-box">
+            <span class="stat-num">12</span>
+            <div class="stat-label">Tests Passing</div>
+          </div>
+          <div class="stat-box">
+            <span class="stat-num">&lt;1s</span>
+            <div class="stat-label">Headline to Alert</div>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-top:16px;">
+          <div class="box">
+            <h3>Live Endpoints (smoke-tested)</h3>
+            <div class="endpoint"><span class="ep-method">POST</span>/pipeline/ingest<span class="ep-status">&#x2705; 200</span></div>
+            <div class="endpoint"><span class="ep-method">POST</span>/pipeline/run<span class="ep-status">&#x2705; 200</span></div>
+            <div class="endpoint"><span class="ep-method">GET</span>/pipeline/recommendations<span class="ep-status">&#x2705; 200</span></div>
+            <div class="endpoint"><span class="ep-method">POST</span>/execution/preview<span class="ep-status">&#x2705; 200</span></div>
+            <div class="endpoint"><span class="ep-method">POST</span>/execution/submit<span class="ep-status">&#x2705; 200</span></div>
+          </div>
+          <div class="box">
+            <h3>Stack in Production</h3>
+            <ul>
+              <li>Python 3.12 &middot; FastAPI &middot; SQLAlchemy 2.0</li>
+              <li>Yahoo Finance quotes &middot; RSS ingestion</li>
+              <li>Schwab broker adapter (dry-run ready)</li>
+              <li>SMTP &middot; Discord &middot; Telegram alerts</li>
+              <li>GitHub Actions CI &middot; Streamlit dashboard</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="card">
+        <h2>What This App Will Do</h2>
+        <div class="grid-2">
+          <div class="box">
+            <h3>Input</h3>
+            <ul>
+              <li>Live news from free or low-cost sources</li>
+              <li>Your watchlist and market context</li>
+              <li>Price and volume changes</li>
+            </ul>
+          </div>
+          <div class="box">
+            <h3>Output</h3>
+            <ul>
+              <li>Priority alert: low, medium, high</li>
+              <li>Action label: Buy candidate, Sell candidate, Hold</li>
+              <li>Confidence score with plain-language reason</li>
+            </ul>
+          </div>
+        </div>
+        <div class="kpi green">
+          <strong>Important:</strong> this is a decision-support assistant, not auto-trading software in MVP.
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="card">
+        <h2>How It Works (Simple Flow)</h2>
+        <div class="flow">
+          <div class="step">1. Collect News</div>
+          <div class="step">2. Filter Relevance</div>
+          <div class="step">3. Map to Sectors and Stocks</div>
+          <div class="step">4. Check Live Price Reaction</div>
+          <div class="step">5. Score and Alert</div>
+        </div>
+        <p style="margin-top: 14px;">Every alert includes why it fired and what could invalidate it.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="card">
+        <h2>Build Timeline <span class="badge badge-done" style="font-size:13px;vertical-align:middle;margin-left:8px;">&#x2705; Completed</span></h2>
+        <div class="timeline">
+          <div class="time-item" style="background:#f0fdf4;border-color:#86efac;"><strong>&#x2705; Weeks 1-2:</strong> Foundation and data ingestion</div>
+          <div class="time-item" style="background:#f0fdf4;border-color:#86efac;"><strong>&#x2705; Weeks 3-5:</strong> Entity extraction and stock/sector mapping</div>
+          <div class="time-item" style="background:#f0fdf4;border-color:#86efac;"><strong>&#x2705; Weeks 5-6:</strong> Live market reaction engine</div>
+          <div class="time-item" style="background:#f0fdf4;border-color:#86efac;"><strong>&#x2705; Weeks 6-8:</strong> Scoring and recommendation logic</div>
+          <div class="time-item" style="background:#f0fdf4;border-color:#86efac;"><strong>&#x2705; Weeks 9-10:</strong> Alerts and dashboard</div>
+          <div class="time-item" style="background:#f0fdf4;border-color:#86efac;"><strong>&#x2705; Weeks 11-12:</strong> Paper-trading validation and tuning</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="card">
+        <h2>Phase 1: Build the Foundation <span class="badge badge-done" style="font-size:13px;vertical-align:middle;margin-left:8px;">&#x2705; Delivered</span></h2>
+        <div class="grid-2">
+          <div class="box">
+            <h3>What gets built</h3>
+            <ul>
+              <li>Core app structure</li>
+              <li>Database and logging</li>
+              <li>Connectors for 2-3 news sources</li>
+            </ul>
+          </div>
+          <div class="box">
+            <h3>What you should see</h3>
+            <ul>
+              <li>News events appearing in system</li>
+              <li>Duplicates reduced</li>
+              <li>Stable service health check</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="card">
+        <h2>Phase 2: Understand Impact <span class="badge badge-done" style="font-size:13px;vertical-align:middle;margin-left:8px;">&#x2705; Delivered</span></h2>
+        <div class="grid-3">
+          <div class="box">
+            <h3>Text Understanding</h3>
+            <p>Extract company names, tickers, sectors, countries, and commodities from each headline.</p>
+          </div>
+          <div class="box">
+            <h3>Mapping</h3>
+            <p>Decide whether the event is stock-specific, sector-wide, or broad macro.</p>
+          </div>
+          <div class="box">
+            <h3>Reaction Check</h3>
+            <p>Measure if price and volume actually moved right after the news.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="card">
+        <h2>Phase 3: Score and Recommend <span class="badge badge-done" style="font-size:13px;vertical-align:middle;margin-left:8px;">&#x2705; Delivered</span></h2>
+        <p>The system combines four parts into one final score.</p>
+        <div class="grid-2">
+          <div class="box">
+            <h3>Score Inputs</h3>
+            <ul>
+              <li>Relevance score</li>
+              <li>Live market reaction score</li>
+              <li>Similarity to past events</li>
+              <li>Source quality score</li>
+            </ul>
+          </div>
+          <div class="box">
+            <h3>Decision Output</h3>
+            <ul>
+              <li>High + positive reaction: Buy candidate</li>
+              <li>High + negative reaction: Sell candidate</li>
+              <li>Mixed or weak evidence: Hold</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="card">
+        <h2>Phase 4: Alerts You Can Trust <span class="badge badge-done" style="font-size:13px;vertical-align:middle;margin-left:8px;">&#x2705; Delivered</span></h2>
+        <div class="grid-2">
+          <div class="box">
+            <h3>Delivery</h3>
+            <ul>
+              <li>Email plus one push channel</li>
+              <li>Priority levels: low, medium, high</li>
+              <li>Simple dashboard for review</li>
+            </ul>
+          </div>
+          <div class="box">
+            <h3>Noise Control</h3>
+            <ul>
+              <li>Dedupe repeated stories</li>
+              <li>Cooldown per symbol</li>
+              <li>Maximum alerts per hour</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="card">
+        <h2>Phase 5: Validate Before Real Use <span class="badge badge-done" style="font-size:13px;vertical-align:middle;margin-left:8px;">&#x2705; Delivered</span></h2>
+        <div class="grid-2">
+          <div class="box">
+            <h3>Paper Mode</h3>
+            <ul>
+              <li>Run as if trading, but no real money</li>
+              <li>Track performance by short, medium, long horizon</li>
+              <li>Tune thresholds weekly</li>
+            </ul>
+          </div>
+          <div class="box">
+            <h3>Metrics to Watch</h3>
+            <ul>
+              <li>How often high alerts are correct</li>
+              <li>False positive rate</li>
+              <li>Time from news to alert</li>
+              <li>Stability during market spikes</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="card">
+        <h2>Budget and Tooling Snapshot</h2>
+        <div class="grid-3">
+          <div class="box">
+            <h3>Monthly Cost Target</h3>
+            <p><strong>Approximate:</strong> 20 to 200 USD/month (excluding existing thinkorswim subscription).</p>
+          </div>
+          <div class="box">
+            <h3>Tech Choices</h3>
+            <p>Python, FastAPI, PostgreSQL, Streamlit, low-cost ingestion connectors.</p>
+          </div>
+          <div class="box">
+            <h3>Risk Policy</h3>
+            <p>Manual decision process, confidence threshold, and no-trade zone when signals conflict.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="card">
+        <h2>What&rsquo;s Next &mdash; v2 Candidates</h2>
+        <p style="margin-bottom:16px;">The MVP is running. These three improvements were identified during live smoke testing as the highest-value next steps.</p>
+        <div class="grid-3">
+          <div class="box">
+            <h3>Schwab OAuth Flow</h3>
+            <p>Replace the manual bearer token with a proper OAuth 2.0 auth code flow so the system refreshes tokens automatically without operator intervention.</p>
+            <p style="margin-top:10px;"><span class="badge badge-next">Next sprint</span></p>
+          </div>
+          <div class="box">
+            <h3>Position Sizing</h3>
+            <p>Replace the simple floor(notional &divide; price) formula with a risk-based model (ATR or Kelly fraction) tuned per symbol and confidence tier.</p>
+            <p style="margin-top:10px;"><span class="badge badge-next">Next sprint</span></p>
+          </div>
+          <div class="box">
+            <h3>Event Deduplication</h3>
+            <p>Prevent the same event from being re-scored across multiple pipeline runs using persistent hash tracking stored in the database.</p>
+            <p style="margin-top:10px;"><span class="badge badge-next">Next sprint</span></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="card">
+        <h2>Engineering Guidelines Going Forward</h2>
+        <ol>
+          <li>Keep scoring weights configurable &mdash; tune after at least 20 live signals.</li>
+          <li>Show a clear explanation for every recommendation.</li>
+          <li>Focus on reducing false positives before adding new signal types.</li>
+          <li>Run paper validation for each new feature before enabling on live orders.</li>
+          <li>Only disable the kill switch intentionally, in writing, after reviewing paper metrics.</li>
+        </ol>
+        <div class="kpi green">
+          <strong>MVP decision point reached:</strong> paper test results are in &mdash; proceeding to v2 enhancements.
+        </div>
+        <p class="footer">GitHub: github.com/Vickalce/trade-news &middot; Latest commit: a7e7a78 &middot; 12 tests passing</p>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
