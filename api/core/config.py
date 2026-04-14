@@ -12,6 +12,10 @@ class Settings(BaseSettings):
     symbol_cooldown_minutes: int = 30
     max_alerts_per_day: int = 100
     kill_switch_enabled: bool = False
+    news_provider: str = "rss"
+    market_data_provider: str = "yahoo"
+    news_timeout_seconds: float = 10.0
+    max_feed_items_per_source: int = 50
     enable_live_market_data: bool = True
     market_data_timeout_seconds: float = 6.0
     alert_channels_csv: str = "email"
@@ -24,6 +28,9 @@ class Settings(BaseSettings):
     discord_webhook_url: str = ""
     telegram_bot_token: str = ""
     telegram_chat_id: str = ""
+    api_key: str = ""
+    rate_limit_window_seconds: int = 60
+    rate_limit_max_requests: int = 30
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
