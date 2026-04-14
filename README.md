@@ -7,9 +7,9 @@ Trade News is a decision-support app that converts market news into explainable 
 - Multi-source RSS ingestion with deduplication
 - Entity extraction and scope classification
 - Symbol and sector-proxy mapping
-- Reaction feature generation and market snapshot persistence
+- Live market quote reaction from Yahoo Finance with deterministic fallback
 - Composite scoring and recommendation engine
-- Alert delivery stubs with cooldown and daily limits
+- Email, Discord, and Telegram alert channels (with local outbox fallback)
 - Paper validation endpoint for signal quality checks
 - Streamlit operator dashboard
 ## Quick Start
@@ -37,6 +37,17 @@ Trade News is a decision-support app that converts market news into explainable 
    - `GET /pipeline/recommendations?limit=50`
 4. Check paper metrics:
    - `GET /validation/paper?limit=200`
+
+## Alert Channels
+Configure one or more channels in `.env` using `ALERT_CHANNELS_CSV`:
+- `email`
+- `discord`
+- `telegram`
+
+Example:
+- `ALERT_CHANNELS_CSV=email,discord,telegram`
+
+If a channel is not configured, alerts are written to `alerts/outbox`.
 1. Start PostgreSQL:
 ## Dashboard
 Run:

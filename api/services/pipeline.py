@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from api.core.config import settings
 from api.db import crud
 from api.schemas import EventScoreInput, PipelineResult
-from api.services.alerts import deliver_stub_alert
+from api.services.alerts import deliver_alerts
 from api.services.classification import classify_scope
 from api.services.extraction import extract_entities
 from api.services.ingestion import collect_events
@@ -40,6 +40,9 @@ def run_signal_pipeline(db: Session, limit: int = 20) -> list[PipelineResult]:
     results: list[PipelineResult] = []
     events = crud.get_recent_events(db, limit=limit)
     today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    channels = [item.strip() for item in settings.alert_channels_csv.split(",") if item.strip()]
+    if not channels:
+        channels = ["email"]
 
     for event in events:
         entities = extract_entities(event.headline, event.body)
@@ -102,11 +105,18 @@ def run_signal_pipeline(db: Session, limit: int = 20) -> list[PipelineResult]:
         )
 
         alerts_today = crud.count_alerts_since(db, today_start)
-        delivery = "suppressed"
+        delivery_statuses = {channel: "suppressed" for channel in channels}
         if not settings.kill_switch_enabled and alerts_today < settings.max_alerts_per_day:
             payload = f"{symbol} | {recommendation} | score={final_score} | {rationale}"
-            delivery = deliver_stub_alert("email", payload)
-        crud.log_alert(db, recommendation_id=rec_row.id, alert_channel="email", priority=priority, delivery_status=delivery)
+            delivery_statuses = deliver_alerts(payload, channels)
+        for channel, status in delivery_statuses.items():
+            crud.log_alert(
+                db,
+                recommendation_id=rec_row.id,
+                alert_channel=channel,
+                priority=priority,
+                delivery_status=status,
+            )
 
         results.append(
             PipelineResult(
