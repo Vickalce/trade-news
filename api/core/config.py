@@ -31,6 +31,13 @@ class Settings(BaseSettings):
     api_key: str = ""
     rate_limit_window_seconds: int = 60
     rate_limit_max_requests: int = 30
+    broker_provider: str = "paper"
+    broker_dry_run: bool = True
+    broker_kill_switch_enabled: bool = True
+    trade_confirm_token: str = "CONFIRM"
+    order_max_notional_usd: float = 5000.0
+    schwab_base_url: str = "https://api.schwabapi.com/trader/v1"
+    schwab_access_token: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

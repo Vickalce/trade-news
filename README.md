@@ -39,6 +39,27 @@ Trade News is a decision-support app that converts market news into explainable 
 4. Check paper metrics:
    - `GET /validation/paper?limit=200` with header `x-api-key`
 
+## Trade Execution (Manual Confirm)
+Execution endpoints are protected by API key and explicit confirm token.
+
+1. Preview an order from a recommendation:
+   - `POST /execution/preview`
+   - Body: `{ "recommendation_id": 1, "account_id": "YOUR_ACCOUNT", "price_hint": 100 }`
+
+2. Submit only after preview review:
+   - `POST /execution/submit`
+   - Body: `{ "recommendation_id": 1, "account_id": "YOUR_ACCOUNT", "price_hint": 100, "confirm_token": "CONFIRM" }`
+
+Safety defaults:
+- `BROKER_KILL_SWITCH_ENABLED=true`
+- `BROKER_DRY_RUN=true`
+- `BROKER_PROVIDER=paper`
+
+For Schwab execution wiring:
+- `BROKER_PROVIDER=schwab`
+- `SCHWAB_ACCESS_TOKEN=<token>`
+- Set kill switch and dry run values intentionally before live use.
+
 ## Providers
 Configure providers in `.env`:
 - `NEWS_PROVIDER=rss` or `demo`

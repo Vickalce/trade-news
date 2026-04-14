@@ -47,3 +47,33 @@ class PipelineResult(BaseModel):
     confidence: float
     rationale: str
     priority: Literal["low", "medium", "high"]
+
+
+class ExecutionPreviewRequest(BaseModel):
+    recommendation_id: int
+    account_id: str
+    price_hint: float = Field(default=100.0, gt=0)
+
+
+class ExecutionSubmitRequest(BaseModel):
+    recommendation_id: int
+    account_id: str
+    price_hint: float = Field(default=100.0, gt=0)
+    confirm_token: str
+
+
+class ExecutionOrder(BaseModel):
+    account_id: str
+    symbol: str
+    side: Literal["BUY", "SELL"]
+    quantity: int = Field(ge=1)
+    order_type: Literal["MARKET"] = "MARKET"
+    time_in_force: Literal["DAY"] = "DAY"
+
+
+class ExecutionResult(BaseModel):
+    status: str
+    provider: str
+    mode: Literal["dry-run", "live"]
+    order_id: str
+    detail: str
