@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: trade-news-postgres
+    environment:
+      POSTGRES_DB: trade_news
+      POSTGRES_USER: trade_news
+      POSTGRES_PASSWORD: trade_news
+    ports:
+      - "5432:5432"
+    volumes:
+      - trade_news_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trade_news -d trade_news"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  trade_news_pgdata:
