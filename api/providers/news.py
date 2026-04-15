@@ -7,6 +7,7 @@ import xml.etree.ElementTree as ET
 import httpx
 
 from api.core.config import settings
+from api.providers.registry import NEWS_PROVIDER_REGISTRY, ProviderCapabilities, ProviderDefinition
 from api.schemas import NormalizedNewsEvent
 from api.services.classification import classify_category
 
@@ -101,8 +102,106 @@ class DemoNewsProvider:
         ]
 
 
+class FinnhubNewsProvider:
+    def collect_events(self) -> list[NormalizedNewsEvent]:
+        if not settings.finnhub_api_key:
+            raise ValueError("FINNHUB_API_KEY is required for Finnhub news provider")
+
+        params = {
+            "category": settings.finnhub_news_category,
+            "token": settings.finnhub_api_key,
+        }
+        endpoint = f"{settings.finnhub_base_url}/news"
+        with httpx.Client(timeout=settings.news_timeout_seconds) as client:
+            response = client.get(endpoint, params=params)
+            response.raise_for_status()
+        payload = response.json()
+        if not isinstance(payload, list):
+            return []
+
+        events: list[NormalizedNewsEvent] = []
+        for item in payload[: settings.max_feed_items_per_source]:
+            if not isinstance(item, dict):
+                continue
+
+            headline = str(item.get("headline") or "").strip()
+            if not headline:
+                continue
+
+            summary = str(item.get("summary") or "").strip() or None
+            source = str(item.get("source") or "finnhub").strip() or "finnhub"
+            url = str(item.get("url") or "").strip() or None
+
+            timestamp_raw = item.get("datetime")
+            event_time = datetime.now(timezone.utc)
+            if isinstance(timestamp_raw, (int, float)) and timestamp_raw > 0:
+                event_time = datetime.fromtimestamp(timestamp_raw, tz=timezone.utc)
+
+            category = classify_category(f"{headline} {summary or ''}")
+            dedupe_seed = f"{headline.lower()}|{source.lower()}|{event_time.strftime('%Y-%m-%d %H:%M')}"
+            dedupe_hash = hashlib.sha256(dedupe_seed.encode("utf-8")).hexdigest()[:64]
+
+            events.append(
+                NormalizedNewsEvent(
+                    event_time_utc=event_time,
+                    source=source[:100],
+                    headline=headline[:500],
+                    body=summary,
+                    url=url[:1000] if url else None,
+                    language="en",
+                    category=category,
+                    dedupe_hash=dedupe_hash,
+                )
+            )
+
+        return events
+
+NEWS_PROVIDER_REGISTRY.register(
+    ProviderDefinition(
+        key="rss",
+        kind="news",
+        display_name="RSS Feed Aggregator",
+        description="Aggregates public RSS feeds from financial news publishers.",
+        factory=RssNewsProvider,
+        capabilities=ProviderCapabilities(
+            auth_type="none",
+            supports_news=True,
+            notes="Best for public headlines; article structure varies by feed.",
+        ),
+    )
+)
+
+NEWS_PROVIDER_REGISTRY.register(
+    ProviderDefinition(
+        key="demo",
+        kind="news",
+        display_name="Demo News Provider",
+        description="Returns deterministic sample headlines for local development.",
+        factory=DemoNewsProvider,
+        capabilities=ProviderCapabilities(
+            auth_type="none",
+            supports_news=True,
+            notes="Development-only provider.",
+        ),
+    )
+)
+
+NEWS_PROVIDER_REGISTRY.register(
+    ProviderDefinition(
+        key="finnhub",
+        kind="news",
+        display_name="Finnhub News",
+        description="Aggregates market news from Finnhub's news API.",
+        factory=FinnhubNewsProvider,
+        capabilities=ProviderCapabilities(
+            auth_type="api_key",
+            supports_news=True,
+            notes="Use FINNHUB_API_KEY and optional FINNHUB_NEWS_CATEGORY.",
+        ),
+        config_keys=("finnhub_api_key",),
+    )
+)
+
 
 def get_news_provider() -> NewsProvider:
-    if settings.news_provider == "demo":
-        return DemoNewsProvider()
-    return RssNewsProvider()
+    return NEWS_PROVIDER_REGISTRY.create(settings.news_provider)

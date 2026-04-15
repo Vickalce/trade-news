@@ -4,6 +4,7 @@ from typing import Protocol
 import httpx
 
 from api.core.config import settings
+from api.providers.registry import MARKET_DATA_PROVIDER_REGISTRY, ProviderCapabilities, ProviderDefinition
 from api.schemas import ReactionFeatures
 
 
@@ -80,8 +81,90 @@ class DeterministicFallbackMarketProvider:
         )
 
 
+class FinnhubMarketDataProvider:
+    def get_reaction_features(self, symbol: str, headline: str) -> ReactionFeatures:
+        if not settings.finnhub_api_key:
+            raise ValueError("FINNHUB_API_KEY is required for Finnhub market data provider")
+
+        params = {
+            "symbol": symbol,
+            "token": settings.finnhub_api_key,
+        }
+        endpoint = f"{settings.finnhub_base_url}/quote"
+        with httpx.Client(timeout=settings.market_data_timeout_seconds) as client:
+            response = client.get(endpoint, params=params)
+            response.raise_for_status()
+        payload = response.json()
+
+        last_price = float(payload.get("c") or 0)
+        baseline_price = float(payload.get("pc") or 0)
+        if last_price <= 0 or baseline_price <= 0:
+            raise ValueError("Finnhub quote payload missing current or previous close")
+
+        # Quote endpoint does not provide live volume; use a stable placeholder baseline.
+        baseline_volume = 100000.0
+        volatility_proxy = abs(last_price - baseline_price) / baseline_price
+
+        return ReactionFeatures(
+            symbol=symbol,
+            last_price=round(last_price, 4),
+            volume=baseline_volume,
+            volatility_proxy=round(volatility_proxy, 6),
+            baseline_price=round(baseline_price, 4),
+            baseline_volume=baseline_volume,
+        )
+
+
+
+MARKET_DATA_PROVIDER_REGISTRY.register(
+    ProviderDefinition(
+        key="yahoo",
+        kind="market_data",
+        display_name="Yahoo Finance",
+        description="Pulls recent chart data from Yahoo Finance for live market reaction scoring.",
+        factory=YahooMarketDataProvider,
+        capabilities=ProviderCapabilities(
+            auth_type="none",
+            supports_market_data=True,
+            supports_live=True,
+            notes="Unofficial public market data endpoint.",
+        ),
+    )
+)
+
+MARKET_DATA_PROVIDER_REGISTRY.register(
+    ProviderDefinition(
+        key="fallback",
+        kind="market_data",
+        display_name="Deterministic Fallback",
+        description="Stable synthetic market data used for local testing and failover.",
+        factory=DeterministicFallbackMarketProvider,
+        capabilities=ProviderCapabilities(
+            auth_type="none",
+            supports_market_data=True,
+            supports_paper=True,
+            notes="No live connectivity required.",
+        ),
+    )
+)
+
+MARKET_DATA_PROVIDER_REGISTRY.register(
+    ProviderDefinition(
+        key="finnhub",
+        kind="market_data",
+        display_name="Finnhub Quote API",
+        description="Uses Finnhub real-time quote endpoint for market reaction scoring.",
+        factory=FinnhubMarketDataProvider,
+        capabilities=ProviderCapabilities(
+            auth_type="api_key",
+            supports_market_data=True,
+            supports_live=True,
+            notes="Volume is approximated because quote endpoint does not include volume.",
+        ),
+        config_keys=("finnhub_api_key",),
+    )
+)
+
 
 def get_market_data_provider() -> MarketDataProvider:
-    if settings.market_data_provider == "fallback":
-        return DeterministicFallbackMarketProvider()
-    return YahooMarketDataProvider()
+    return MARKET_DATA_PROVIDER_REGISTRY.create(settings.market_data_provider)

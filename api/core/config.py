@@ -38,6 +38,18 @@ class Settings(BaseSettings):
     order_max_notional_usd: float = 5000.0
     schwab_base_url: str = "https://api.schwabapi.com/trader/v1"
     schwab_access_token: str = ""
+    schwab_client_id: str = ""
+    schwab_client_secret: str = ""
+    schwab_redirect_uri: str = ""
+    schwab_oauth_authorize_url: str = "https://api.schwabapi.com/v1/oauth/authorize"
+    schwab_oauth_token_url: str = "https://api.schwabapi.com/v1/oauth/token"
+    schwab_oauth_scope: str = ""
+    alpaca_base_url: str = "https://paper-api.alpaca.markets/v2"
+    alpaca_api_key: str = ""
+    alpaca_secret_key: str = ""
+    finnhub_base_url: str = "https://finnhub.io/api/v1"
+    finnhub_api_key: str = ""
+    finnhub_news_category: str = "general"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
