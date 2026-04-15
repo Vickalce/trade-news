@@ -1,0 +1,32 @@
+<svg width="1200" height="400" viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Trade News Logo Option 1</title>
+  <desc id="desc">A dynamic market chart rising from a newspaper tile, representing actionable news-driven trading.</desc>
+  <defs>
+    <linearGradient id="bg1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0B1E2D"/>
+      <stop offset="100%" stop-color="#113D5C"/>
+    </linearGradient>
+    <linearGradient id="bull" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00A86B"/>
+      <stop offset="100%" stop-color="#21D19F"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="400" rx="34" fill="url(#bg1)"/>
+
+  <g transform="translate(70,70)">
+    <rect x="0" y="0" width="260" height="260" rx="28" fill="#F3F7FA"/>
+    <rect x="26" y="30" width="116" height="20" rx="10" fill="#18415B" opacity="0.85"/>
+    <rect x="26" y="64" width="204" height="10" rx="5" fill="#94AFC0"/>
+    <rect x="26" y="82" width="186" height="10" rx="5" fill="#B6C8D5"/>
+    <rect x="26" y="100" width="172" height="10" rx="5" fill="#C9D7E1"/>
+
+    <polyline points="35,205 85,176 120,188 154,150 190,161 225,118" fill="none" stroke="url(#bull)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="225" cy="118" r="10" fill="#21D19F"/>
+  </g>
+
+  <g transform="translate(380,112)">
+    <text x="0" y="92" font-family="Poppins, Segoe UI, Arial, sans-serif" font-size="104" font-weight="700" letter-spacing="1.2" fill="#EAF4FB">Trade News</text>
+    <text x="4" y="142" font-family="IBM Plex Sans, Segoe UI, Arial, sans-serif" font-size="30" font-weight="500" letter-spacing="4" fill="#9FD0EA">HEADLINES INTO SIGNALS</text>
+  </g>
+</svg>

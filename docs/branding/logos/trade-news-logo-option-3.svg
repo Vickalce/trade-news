@@ -1,0 +1,38 @@
+<svg width="1200" height="400" viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Trade News Logo Option 3</title>
+  <desc id="desc">A radar-like signal beacon over folded headlines, suggesting breaking news transformed into trade intelligence.</desc>
+  <defs>
+    <linearGradient id="bg3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#101010"/>
+      <stop offset="100%" stop-color="#2A2A2A"/>
+    </linearGradient>
+    <radialGradient id="pulse" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFB703" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#FB8500" stop-opacity="0.3"/>
+    </radialGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="400" rx="34" fill="url(#bg3)"/>
+
+  <g transform="translate(58,58)">
+    <rect x="24" y="38" width="250" height="220" rx="24" fill="#F5F5F5"/>
+    <rect x="0" y="16" width="250" height="220" rx="24" fill="#FFFFFF"/>
+
+    <rect x="28" y="48" width="92" height="18" rx="9" fill="#232323"/>
+    <rect x="28" y="80" width="186" height="10" rx="5" fill="#B9C0C7"/>
+    <rect x="28" y="98" width="166" height="10" rx="5" fill="#C8CED4"/>
+    <rect x="28" y="116" width="178" height="10" rx="5" fill="#D6DBE0"/>
+
+    <circle cx="206" cy="186" r="76" fill="url(#pulse)"/>
+    <circle cx="206" cy="186" r="56" fill="none" stroke="#FB8500" stroke-width="4" opacity="0.8"/>
+    <circle cx="206" cy="186" r="36" fill="none" stroke="#FB8500" stroke-width="4" opacity="0.85"/>
+    <circle cx="206" cy="186" r="16" fill="#FB8500"/>
+
+    <polyline points="32,208 70,192 100,200 138,170 164,176" fill="none" stroke="#2A9D8F" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <g transform="translate(380,110)">
+    <text x="0" y="94" font-family="Sora, Segoe UI, Arial, sans-serif" font-size="106" font-weight="700" letter-spacing="1" fill="#F4F4F4">Trade News</text>
+    <text x="4" y="146" font-family="Barlow, Segoe UI, Arial, sans-serif" font-size="30" font-weight="600" letter-spacing="3.4" fill="#FFB703">BREAKING NEWS. TRADING CLARITY.</text>
+  </g>
+</svg>
