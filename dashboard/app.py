@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from pathlib import Path
 
+import httpx
 import pandas as pd
 import streamlit as st
 from sqlalchemy import create_engine, text
@@ -107,6 +108,26 @@ def load_alert_rollup(limit: int = 300) -> pd.DataFrame:
             alert_summary=("channel_status", lambda values: " | ".join(dict.fromkeys(values))),
         )
     )
+
+
+@st.cache_data(ttl=20)
+def load_provider_catalog(api_base_url: str, api_key: str) -> tuple[dict | None, str | None]:
+    endpoint = f"{api_base_url.rstrip('/')}/providers"
+    headers: dict[str, str] = {}
+    if api_key:
+        headers["x-api-key"] = api_key
+
+    try:
+        with httpx.Client(timeout=4.0) as client:
+            response = client.get(endpoint, headers=headers)
+        if response.status_code != 200:
+            return None, f"Provider API returned {response.status_code}."
+        payload = response.json()
+        if not isinstance(payload, dict):
+            return None, "Provider API response was not a JSON object."
+        return payload, None
+    except Exception as exc:
+        return None, f"Could not reach provider API: {exc}"
 
 
 def inject_styles() -> None:
@@ -536,12 +557,49 @@ with st.sidebar:
     symbol_filter = st.text_input("Filter symbol", value="", placeholder="AAPL, NVDA, XLE")
     min_confidence = st.slider("Minimum confidence", min_value=0, max_value=100, value=40)
     row_limit = st.slider("Signals to load", min_value=10, max_value=200, value=60, step=10)
+    provider_api_base_url = st.text_input("Provider API base URL", value="http://localhost:8000")
     refresh = st.button("Refresh feed", use_container_width=True)
     st.divider()
     st.markdown("### Launch mode")
     st.markdown("- Manual decision support first")
     st.markdown("- Paper trading before live execution")
     st.markdown("- Schwab auth pending approval")
+
+    st.divider()
+    st.markdown("### Provider settings")
+    provider_catalog, provider_catalog_error = load_provider_catalog(provider_api_base_url, settings.api_key)
+    if provider_catalog_error:
+        st.caption(provider_catalog_error)
+        st.caption("Start the FastAPI server to load provider metadata from /providers.")
+    else:
+        selected = provider_catalog.get("selected", {})
+        providers_by_kind = provider_catalog.get("providers", {})
+
+        for kind, label in (("news", "News"), ("market_data", "Market Data"), ("execution", "Execution")):
+            selected_key = str(selected.get(kind) or "unset")
+            options = providers_by_kind.get(kind) or []
+
+            selected_entry = None
+            for option in options:
+                if str(option.get("key", "")).lower() == selected_key.lower():
+                    selected_entry = option
+                    break
+
+            configured_text = "configured"
+            if selected_entry is not None and not bool(selected_entry.get("configured")):
+                configured_text = "needs credentials"
+
+            st.markdown(f"**{label}:** {selected_key}")
+            st.caption(f"{len(options)} options | selected provider is {configured_text}")
+
+        with st.expander("Supported providers", expanded=False):
+            for kind, label in (("news", "News"), ("market_data", "Market Data"), ("execution", "Execution")):
+                st.markdown(f"**{label}**")
+                for option in providers_by_kind.get(kind) or []:
+                    key = option.get("key", "unknown")
+                    configured = "configured" if option.get("configured") else "missing credentials"
+                    auth_type = option.get("capabilities", {}).get("auth_type", "unknown")
+                    st.markdown(f"- {key} | {configured} | auth: {auth_type}")
 
 if refresh:
     st.cache_data.clear()
