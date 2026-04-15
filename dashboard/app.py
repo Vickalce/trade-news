@@ -130,6 +130,34 @@ def load_provider_catalog(api_base_url: str, api_key: str) -> tuple[dict | None,
         return None, f"Could not reach provider API: {exc}"
 
 
+def build_env_snippet(kind: str, provider_key: str, config_keys: list[str]) -> str:
+    lines: list[str] = []
+
+    if kind == "news":
+        lines.append(f"NEWS_PROVIDER={provider_key}")
+    elif kind == "market_data":
+        lines.append(f"MARKET_DATA_PROVIDER={provider_key}")
+    elif kind == "execution":
+        lines.append(f"BROKER_PROVIDER={provider_key}")
+
+    for key in config_keys:
+        env_key = key.upper()
+        if env_key == "ALPACA_BASE_URL":
+            lines.append("ALPACA_BASE_URL=https://paper-api.alpaca.markets/v2")
+        elif env_key == "FINNHUB_BASE_URL":
+            lines.append("FINNHUB_BASE_URL=https://finnhub.io/api/v1")
+        elif env_key == "FINNHUB_NEWS_CATEGORY":
+            lines.append("FINNHUB_NEWS_CATEGORY=general")
+        elif env_key == "SCHWAB_OAUTH_AUTHORIZE_URL":
+            lines.append("SCHWAB_OAUTH_AUTHORIZE_URL=https://api.schwabapi.com/v1/oauth/authorize")
+        elif env_key == "SCHWAB_OAUTH_TOKEN_URL":
+            lines.append("SCHWAB_OAUTH_TOKEN_URL=https://api.schwabapi.com/v1/oauth/token")
+        else:
+            lines.append(f"{env_key}=")
+
+    return "\n".join(lines)
+
+
 def inject_styles() -> None:
     st.markdown(
         """
@@ -600,6 +628,37 @@ with st.sidebar:
                     configured = "configured" if option.get("configured") else "missing credentials"
                     auth_type = option.get("capabilities", {}).get("auth_type", "unknown")
                     st.markdown(f"- {key} | {configured} | auth: {auth_type}")
+
+        with st.expander("Setup helper", expanded=False):
+            kind_options = {
+                "News": "news",
+                "Market Data": "market_data",
+                "Execution": "execution",
+            }
+            selected_kind_label = st.selectbox("Provider type", options=list(kind_options.keys()), key="setup_kind")
+            selected_kind = kind_options[selected_kind_label]
+
+            options_for_kind = providers_by_kind.get(selected_kind) or []
+            if not options_for_kind:
+                st.caption("No providers found for the selected type.")
+            else:
+                option_labels = [str(item.get("key") or "unknown") for item in options_for_kind]
+                default_key = str(selected.get(selected_kind) or option_labels[0])
+                default_index = option_labels.index(default_key) if default_key in option_labels else 0
+                chosen_key = st.selectbox("Provider", options=option_labels, index=default_index, key="setup_provider")
+
+                chosen_entry = next(item for item in options_for_kind if str(item.get("key")) == chosen_key)
+                config_keys = [str(value) for value in (chosen_entry.get("config_keys") or [])]
+                env_snippet = build_env_snippet(selected_kind, chosen_key, config_keys)
+
+                st.caption("Copy these lines into your .env file")
+                st.code(env_snippet, language="bash")
+
+                if config_keys:
+                    st.caption("Required credential keys")
+                    st.markdown("\n".join([f"- {key.upper()}" for key in config_keys]))
+                else:
+                    st.caption("No extra credentials required for this provider.")
 
 if refresh:
     st.cache_data.clear()
